@@ -10,6 +10,7 @@ import com.example.myluck.service.SysAuthService;
 import com.example.myluck.service.SysRoleService;
 import com.example.myluck.service.SysUserService;
 import com.example.myluck.util.EncryptUtil;
+import com.example.myluck.util.Md5Utils;
 import com.example.myluck.vo.Json;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,6 +53,11 @@ public class LoginController{
 		Map<String, Object> data = new HashMap<String, Object>();
 		if(StringUtils.isBlank(record.getUserName())) {
 			return Json.fail("账号不能为空", "账号不能为空") ;
+		}
+		try {
+			record.setPassword(Md5Utils.md5(record.getPassword()));
+		} catch (Exception e) {
+			return Json.fail("", "帐号与密码错误不正确");
 		}
 		SysUser user = sysUserService.getUserByAccount(record);
 		if(user == null) {
@@ -103,7 +109,6 @@ public class LoginController{
 	public Json changePassword(HttpServletRequest request,@RequestBody String body) {
 		JSONObject json = JSON.parseObject(body);
 		String newPwd = json.getString("newPwd");
-		String oldPwd = json.getString("oldPwd");
 		String authKey = request.getHeader(Constant.AUTH_KEY);
 		if (StringUtils.isNotBlank(authKey)) {
 			String decryptAuthKey = EncryptUtil.decryptBase64(authKey, Constant.SECRET_KEY);
@@ -117,15 +122,18 @@ public class LoginController{
 			if (currentUser == null) {
 				return Json.fail("", "用户没登录，请登录后修改密码");
 			}
-			if(!currentUser.getPassword().equals(oldPwd)){
-				Json.fail("", "旧密码错误");
-			}
 			SysUser record = new SysUser();
 			record.setUid(currentUser.getUid());
-			record.setPassword(newPwd);
+			String ss ;
+			try {
+				ss = Md5Utils.md5(newPwd);;
+				record.setPassword(ss);
+			} catch (Exception e) {
+				return Json.fail("", "新密码设置失败");
+			}
 			record.setUpdateTime(new Date());
 			sysUserService.updateById(record);
-			String newauthKey = EncryptUtil.encryptBase64(currentUser.getUserName() + "|" + newPwd, Constant.SECRET_KEY);
+			String newauthKey = EncryptUtil.encryptBase64(currentUser.getUserName() + "|" + ss, Constant.SECRET_KEY);
 			return Json.succ("更新密码").data("authKey", newauthKey);
 		}
 		return Json.fail("", "用户没登录，请登录后修改密码");

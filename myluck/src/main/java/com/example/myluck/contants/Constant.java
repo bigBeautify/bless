@@ -10,6 +10,7 @@ public class Constant {
 	public final static String SESSION_ID = "sessionId";
 	//安全密匙
 	public static String SECRET_KEY = "#rSgRKVunlLUMopFWbEevOy9";
+	public static String MD5_KEY = "ssamatching";
 	//超级角色码值
 	public final static String SUPER = "super";
 

@@ -9,6 +9,7 @@ import com.example.myluck.entity.SysUser;
 import com.example.myluck.entity.SysUserRole;
 import com.example.myluck.service.SysUserRoleService;
 import com.example.myluck.service.SysUserService;
+import com.example.myluck.util.Md5Utils;
 import com.example.myluck.util.PageUtils;
 import com.example.myluck.vo.Json;
 import io.swagger.annotations.Api;
@@ -68,6 +69,11 @@ public class SysUserController {
         if (StringUtils.isEmpty(user.getPassword())) {
             return Json.fail(oper, "密码不能为空");
         }
+        try {
+            user.setPassword(Md5Utils.md5(user.getPassword()));
+        } catch (Exception e) {
+            return Json.fail("", "密码设置失败");
+        }
         SysUser userDB = sysUserService.getOne(new QueryWrapper<SysUser>().eq("user_name", user.getUserName()));
         if (userDB != null) {
             return Json.fail(oper, "用户已注册");
@@ -82,6 +88,11 @@ public class SysUserController {
     public Json update(@RequestBody String body) {
         String oper = "update user";
         SysUser user = JSON.parseObject(body, SysUser.class);
+        try {
+            user.setPassword(Md5Utils.md5(user.getPassword()));
+        } catch (Exception e) {
+            return Json.fail("", "密码设置失败");
+        }
         user.setUpdateTime(new Date());
         boolean b = sysUserService.updateById(user);
         return Json.result(oper, b);

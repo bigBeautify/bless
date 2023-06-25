@@ -1,5 +1,6 @@
 package com.example.myluck.controller;
 
+import com.example.myluck.util.Md5Utils;
 import com.example.myluck.vo.Json;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -20,5 +21,12 @@ class SysUserControllerTest {
         Json user = sysUserController.findUserByName("admin");
         System.out.println(user);
     }
+
+    @Test
+    void password() {
+
+    }
+
+
 
 }

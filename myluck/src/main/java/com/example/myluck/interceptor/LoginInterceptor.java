@@ -5,6 +5,7 @@ import com.example.myluck.contants.Constant;
 import com.example.myluck.entity.SysUser;
 import com.example.myluck.service.SysUserService;
 import com.example.myluck.util.EncryptUtil;
+import com.example.myluck.util.Md5Utils;
 import com.example.myluck.vo.Json;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		String password = auths[1];
 		QueryWrapper<SysUser> qw = new QueryWrapper<>();
 		qw.eq("user_name",username);
-		qw.eq("password",password);
+		qw.eq("password", password);
 		SysUser sessionUser = sysUserService.getOne(qw);
 		if(sessionUser == null ) {
 			response.setContentType("application/json;charset=UTF-8");
