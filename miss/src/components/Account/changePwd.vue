@@ -2,8 +2,8 @@
 	<el-dialog ref="dialog" :visible.sync="dialogForm" custom-class="w-400 h-300" title="修改密码">
 		<div class="ovf-auto">
 			<el-form ref="form" :model="form" :rules="rules" label-width="80px">
-				<el-form-item label="旧密码" prop="oldPwd">
-					<el-input type="password" v-model.trim="form.oldPwd"></el-input>
+				<el-form-item label="新密码" prop="firstnewPwd">
+					<el-input type="password" v-model.trim="form.firstnewPwd"></el-input>
 				</el-form-item>
 				<el-form-item label="新密码" prop="newPwd">
 					<el-input type="password" v-model.trim="form.newPwd"></el-input>
@@ -25,22 +25,21 @@
 
   export default {
     data() {
-      let validateOld = (rule, value, callback) => {
-        let user = Lockr.get('userInfo');
+      let validateNew = (rule, value, callback) => {
         if (value === '' || value.trim() ==='') {
           callback(new Error('必填'));
-        }else if(user.password != value){
-          callback(new Error('原密码错误'));
-        }else {
+        }else if(this.form.firstnewPwd != this.form.newPwd){
+          callback(new Error('2次密码不一致'));
+        }
+        else {
           callback();
         }
       };
-      let validateNew = (rule, value, callback) => {
-        debugger
+      let validatefirstNew = (rule, value, callback) => {
         if (value === '' || value.trim() ==='') {
           callback(new Error('必填'));
-        }else if(this.form.oldPwd == this.form.newPwd){
-          callback(new Error('新旧密码不能一样'));
+        }else if(this.form.firstnewPwd != this.form.newPwd){
+          callback(new Error('2次密码不一致'));
         }
         else {
           callback();
@@ -51,12 +50,12 @@
         dialogForm:false,
         form: {
           auth_key: '',
-          oldPwd: '',
+          firstnewPwd: '',
           newPwd: ''
         },
         rules: {
-          oldPwd: [
-            { required: true, validator: validateOld, trigger: 'change' },
+          firstnewPwd: [
+            { required: true, validator: validatefirstNew, trigger: 'change' },
             { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
           ],
           newPwd: [
@@ -78,7 +77,6 @@
           if (pass) {
             this.disable = !this.disable
             let data={
-              oldPwd: this.form.oldPwd,
               newPwd: this.form.newPwd
             }
             this.apiPost('admin/changePassword', data).then((res) => {
