@@ -10,6 +10,12 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher  #解决springboot 2.7.x和swagger2的冲突
 
+logging:
+  level:
+    com:
+      example:
+        myluck:
+          dao: debug
 
 
 
